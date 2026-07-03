@@ -12,19 +12,22 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "engines": {
+    "node": ">=24 <27"
+  },
   "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/http-client": "^2.2.3",
-    "jsonwebtoken": "^9.0.2"
+    "@actions/core": "^3.0.1",
+    "@actions/http-client": "^4.0.1",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.34.0",
+    "@eslint/js": "^9.39.4",
     "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^24.3.1",
+    "@types/node": "^24.13.2",
     "@vercel/ncc": "^0.38.2",
-    "eslint": "^9.34.0",
-    "globals": "^16.3.0",
-    "typescript": "^5.6.3",
-    "typescript-eslint": "^8.41.0"
+    "eslint": "^9.39.4",
+    "globals": "^16.5.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.62.1"
   }
 }
