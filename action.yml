@@ -1,5 +1,5 @@
 name: "Fluxzero JWT"
-description: "Generate a Fluxzero JWT to be used for logging into the registry or deploying an application. Supports API key mode (token) and OIDC mode (for GitHub Actions without stored secrets)."
+description: "Generate a Fluxzero JWT for registry auth and deployments using API key or OIDC mode."
 author: fluxzero-io
 branding:
   icon: unlock
