@@ -11,21 +11,42 @@ permissions:
   contents: write
 
 jobs:
+  verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 24, 26]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Type-check
+        run: npm run check
+      - name: Lint
+        run: npm run lint
+
   build-and-commit:
     if: github.actor != 'github-actions[bot]'
+    needs: verify
     runs-on: ubuntu-latest
     concurrency:
       group: autobuild-${{ github.ref }}
       cancel-in-progress: false
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 26
           cache: npm
 
       - name: Install dependencies
