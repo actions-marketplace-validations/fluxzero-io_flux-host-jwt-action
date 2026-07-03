@@ -40,5 +40,5 @@ outputs:
     description: "Registry host for docker login (OIDC mode only)"
 
 runs:
-  using: "node20"
+  using: "node24"
   main: "dist/index.js"

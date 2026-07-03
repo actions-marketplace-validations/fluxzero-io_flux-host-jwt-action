@@ -10,6 +10,27 @@ This action generates a short-lived JWT for authenticating against the **Fluxzer
 
 ---
 
+## Runtime support
+
+This action runs as a JavaScript action using GitHub Actions' `node24` runtime. Node.js 24 is the current LTS line; Node.js 26 is a Current release and is expected to become LTS in October 2026.
+
+The bundled action code is kept compatible with Node.js 24 and Node.js 26, but GitHub Actions currently supports `node24` as the newest JavaScript action runtime in `action.yml`. The action will move to a newer GitHub runtime after GitHub adds one and Node.js 26 becomes a suitable LTS target.
+
+Project CI verifies the action code on Node.js 20, Node.js 24, and Node.js 26. Node.js 20 is covered only as a temporary legacy compatibility check; the single bundled `dist` build uses Node.js 26.
+
+### GitHub runner defaults and overrides
+
+GitHub-hosted runners began using Node.js 24 by default for JavaScript actions on June 16, 2026. This action declares `runs.using: node24`, so no workflow override is required.
+
+If another action in the same workflow still depends on Node.js 20, GitHub provides a temporary opt-out:
+
+```yaml
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+```
+
+Treat that override as temporary only. It keeps deprecated Node.js 20 behavior available for legacy actions until GitHub removes Node.js 20 from the runner.
+
 ## OIDC Mode (recommended)
 
 OIDC mode uses GitHub's built-in OIDC provider to authenticate with Fluxzero. No API key secret needs to be stored in the repository.
