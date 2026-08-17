@@ -4,7 +4,8 @@ import {HttpClient} from '@actions/http-client';
 import {ApiKeyResult} from "./ApiKeyResult";
 
 interface ExchangeTokenResponse {
-    registryToken: string;
+    token: string;
+    userId: string;
     deployToken: string;
     registryHost: string;
 }
@@ -26,14 +27,14 @@ async function run() {
 
 async function runOidcMode() {
     const fluxzeroHost = core.getInput('fluxzero-host', {required: true});
-    const imageName = core.getInput('image-name', {required: true});
     const audience = core.getInput('audience', {required: true});
     const oidcToken = await core.getIDToken(audience);
+    core.setSecret(oidcToken);
 
     const httpClient = new HttpClient('fluxzero-jwt-action');
     const response = await httpClient.post(
-        `${fluxzeroHost}/api/github/exchange-token`,
-        JSON.stringify({oidcToken, imageName}),
+        `${fluxzeroHost}/api/integrations/exchange-token`,
+        JSON.stringify({externalToken: oidcToken}),
         {'Content-Type': 'application/json'}
     );
 
@@ -44,22 +45,17 @@ async function runOidcMode() {
     }
 
     const data: ExchangeTokenResponse = JSON.parse(body);
-
-    // registryToken is Base64(userId:jwt) — decode to extract parts
-    const decoded = Buffer.from(data.registryToken, 'base64').toString();
-    const colonIndex = decoded.indexOf(':');
-    if (colonIndex === -1) {
-        throw new Error('Invalid registryToken format');
+    for (const field of ['token', 'userId', 'deployToken', 'registryHost'] as const) {
+        if (typeof data[field] !== 'string' || data[field].trim() === '') {
+            throw new Error(`Invalid token exchange response: missing ${field}`);
+        }
     }
-    const userId = decoded.substring(0, colonIndex);
-    const registryJwt = decoded.substring(colonIndex + 1);
-
-    core.setOutput('token', registryJwt);
-    core.setOutput('userId', userId);
+    core.setOutput('token', data.token);
+    core.setOutput('userId', data.userId);
     core.setOutput('deploy-token', data.deployToken);
     core.setOutput('registry-host', data.registryHost);
 
-    core.setSecret(registryJwt);
+    core.setSecret(data.token);
     core.setSecret(data.deployToken);
 }
 

@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-08-17
+
+### Changed
+- OIDC mode exchanges the GitHub credential through the provider-neutral `/api/integrations/exchange-token` endpoint.
+- Existing action outputs remain unchanged while authentication no longer depends on GitHub App installation or repository-connection state.
+- `image-name` remains accepted for workflow compatibility but is no longer required or sent during authentication.
+
+### Added
+- Executable coverage for the bundled OIDC exchange contract.
+
 ## [2.2.1] - 2026-07-03
 
 ### Fixed

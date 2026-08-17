@@ -1,12 +1,13 @@
 {
   "name": "fluxzero-jwt-action",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "main": "src/index.ts",
   "scripts": {
     "check": "tsc",
     "lint": "eslint .",
     "build": "ncc build --minify --license licenses.txt",
-    "ci": "npm run check && npm run build"
+    "test": "node --test test/*.test.mjs",
+    "ci": "npm run check && npm run build && npm test"
   },
   "keywords": [],
   "author": "",
