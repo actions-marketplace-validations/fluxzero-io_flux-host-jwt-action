@@ -35,7 +35,7 @@ Treat that override as temporary only. It keeps deprecated Node.js 20 behavior a
 
 OIDC mode uses GitHub's built-in OIDC provider to authenticate with Fluxzero. No API key secret needs to be stored in the repository.
 
-**Prerequisites:** your repository must be connected to a Fluxzero team via the GitHub App integration.
+**Prerequisites:** a Fluxzero Integration must have a matching GitHub OIDC authentication method and deployment access to the target team.
 
 ```yaml
 jobs:
@@ -52,7 +52,6 @@ jobs:
         uses: fluxzero-io/fluxzero-jwt-action@v2
         with:
           mode: oidc
-          image-name: my-app
 
       - name: Log in to Fluxzero Container Registry
         run: |
@@ -105,7 +104,7 @@ jobs:
 | `api-key`          |    no    |                -                     | Fluxzero System API key (required in `token` mode)           |
 | `fluxzero-host`    |    no    | `https://api.dashboard.fluxzero.io`  | Fluxzero API host (`oidc` mode)                              |
 | `audience`         |    no    | `https://cloud.fluxzero.io`          | OIDC audience claim (`oidc` mode)                            |
-| `image-name`       |    no    |                -                     | Docker image name to push (required in `oidc` mode)          |
+| `image-name`       |    no    |                -                     | Deprecated compatibility input; ignored in `oidc` mode      |
 | `validity-seconds` |    no    | `300`                                | Token validity in seconds (`token` mode only)                |
 
 ---
@@ -129,7 +128,7 @@ You can test the OIDC token exchange end-to-end against a locally running `flux-
 
 - [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) installed
 - `flux-host-service` checked out locally
-- A GitHub App installed on the target org/repo with a repo connection to a Fluxzero team
+- A Fluxzero Integration with a matching GitHub OIDC method and deployment access to the target team
 
 ### 1. Start the backend
 
@@ -142,8 +141,6 @@ mvn -pl app spring-boot:run
 Make sure `app/src/main/resources/application-local.properties` has these properties set:
 
 ```properties
-feature.github.enabled=true
-github.webhook-secret=<your-webhook-secret>
 github.ci.token-secret=<your-ci-token-secret>
 docker-registry-public.host=registry.fluxzero.io
 ```
@@ -189,7 +186,7 @@ Add the `local-deploy` label to trigger the workflow.
 
 1. Parses `audience` and `baseurl` from the PR body
 2. Requests a GitHub OIDC token with the configured audience
-3. Exchanges it with the Fluxzero backend at `<baseurl>/api/github/exchange-token`
+3. Exchanges it with the Fluxzero backend at `<baseurl>/api/integrations/exchange-token`
 4. Verifies Docker registry login with the returned credentials
 5. Deploys using `fluxzero-deploy-action` at `<baseurl>/deploy-application`
 
@@ -202,9 +199,8 @@ Add the `local-deploy` label to trigger the workflow.
 | `Error occurred while trying to proxy` (504) | Spring Boot backend not running on port 8080 | Start the backend with `mvn -pl app spring-boot:run` |
 | Docker login hits `registry-1.docker.io` | `docker-registry-public.host` property not set | Add `docker-registry-public.host=registry.fluxzero.io` to `application-local.properties` |
 | OIDC token validation fails | Audience mismatch | Use `audience=https://cloud.fluxzero.io` (the server default), not the tunnel URL |
-| `No team with a repo connection found for repository` | The GitHub repository is not linked to a Fluxzero team | In the Fluxzero dashboard, connect your repository to a team. The OIDC exchange requires a repo connection to determine which team to issue tokens for |
+| OIDC credential is rejected | No single Integration authentication method matches its signed claims | Check the Integration's issuer, audience, repository/organisation restrictions, and team authorisation in the dashboard |
 | `invalid reference format` in Docker build/push | `docker-registry-public.host` includes `https://` | The property must be a bare hostname (e.g. `registry.fluxzero.io`), not a URL |
-| `No Fluxzero installation found for GitHub account` after server restart | Local database was reset — all GitHub connections are lost | Re-run the GitHub App connection flow in the dashboard and re-link your repository to a team |
 
 ---
 

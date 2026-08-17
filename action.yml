@@ -22,7 +22,7 @@ inputs:
     required: false
     default: "https://cloud.fluxzero.io"
   image-name:
-    description: "Docker image name to push (required in oidc mode)"
+    description: "Deprecated compatibility input; no longer used in OIDC mode"
     required: false
   validity-seconds:
     description: "Token validity in seconds (token mode only)"

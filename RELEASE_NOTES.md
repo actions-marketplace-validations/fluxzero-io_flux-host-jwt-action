@@ -1,10 +1,6 @@
-This release fixes GitHub Marketplace validation by shortening the Action metadata description.
+This release moves OIDC mode to Fluxzero's provider-neutral Integration exchange.
 
-This release updates the action for GitHub's Node.js 20 deprecation.
-
-- Runs the action on GitHub's `node24` JavaScript action runtime.
-- Verifies compatibility on Node.js 20, 24, and 26.
-- Uses Node.js 26 for the bundled `dist` build in CI.
-- Updates Actions toolkit, JWT, TypeScript, ESLint, and related dependencies.
-- Updates workflows to `actions/checkout@v6` and `actions/setup-node@v6`.
-- Documents runtime defaults, Node.js 26 compatibility, and the temporary Node.js 20 override behavior.
+- Calls `/api/integrations/exchange-token` instead of the legacy GitHub endpoint.
+- Preserves the existing `token`, `userId`, `deploy-token`, and `registry-host` outputs.
+- Keeps `image-name` as an accepted compatibility input, but no longer requires or sends it.
+- Adds an executable contract test for the bundled action and exchange interface.
